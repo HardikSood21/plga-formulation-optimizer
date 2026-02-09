@@ -372,7 +372,7 @@ def optimize_formulation(drug_properties, target_size, min_ee, n_top):
 
 # ========== MAIN CONTENT AREA ==========
 
-    if optimize_button:
+if optimize_button:
     drug_properties = {
         'mol_MW': mol_MW,
         'mol_logP': mol_logP,
@@ -651,3 +651,4 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
