@@ -399,10 +399,6 @@ if optimize_button:
             n_recommendations,
             constraints=polymer_constraints  # Pass polymer constraints
         )
-    
-    # ... rest of display code
-    # Run optimization
-    
     # Success message
     st.success("✅ **Optimization Complete!** Found optimal formulation parameters.")
     
@@ -651,4 +647,5 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
