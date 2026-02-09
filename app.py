@@ -254,9 +254,13 @@ optimize_button = st.sidebar.button(
     help="Click to generate optimized formulation recommendations"
 )
 
+
 # ========== OPTIMIZATION FUNCTION ==========
-def optimize_formulation(drug_properties, target_size, min_ee, n_top):
-    """Generate optimized formulation recommendations"""
+def optimize_formulation(drug_properties, target_size, min_ee, n_top, constraints=None):
+    """
+    Generate optimized formulation recommendations
+    constraints: dict with polymer_MW and LA/GA if user specified them
+    """
     
     # Filter successful formulations from dataset
     successful = df[df['particle_size'] < target_size]
@@ -284,6 +288,13 @@ def optimize_formulation(drug_properties, target_size, min_ee, n_top):
         'pH': successful['pH'].unique().tolist(),
         'solvent_polarity_index': successful['solvent_polarity_index'].unique().tolist()
     }
+    
+    # Apply constraints if provided
+    if constraints is not None:
+        if 'polymer_MW' in constraints and constraints['polymer_MW'] is not None:
+            formulation_space['polymer_MW'] = [constraints['polymer_MW']]
+        if 'LA/GA' in constraints and constraints['LA/GA'] is not None:
+            formulation_space['LA/GA'] = [constraints['LA/GA']]
     
     # Generate candidates
     import random
@@ -369,10 +380,12 @@ def optimize_formulation(drug_properties, target_size, min_ee, n_top):
     }
     
     return recommendations, stats
+    
 
 # ========== MAIN CONTENT AREA ==========
 
 if optimize_button:
+    # Collect drug properties
     drug_properties = {
         'mol_MW': mol_MW,
         'mol_logP': mol_logP,
@@ -384,11 +397,12 @@ if optimize_button:
     }
     
     # Show what mode is being used
-    if polymer_constraints:
+    if polymer_mode == "I have specific PLGA in my lab":
         st.info(f"🔒 **Using your PLGA:** MW = {polymer_constraints['polymer_MW']} kDa, LA/GA = {polymer_constraints['LA/GA']}")
         st.info("✨ **Optimizing:** Drug/polymer ratio, surfactant type & concentration, pH, aqueous/organic ratio, solvent polarity")
     else:
         st.info("🚀 **Full Auto-Optimization Mode** - Finding the best PLGA type and all formulation parameters")
+        polymer_constraints = None  # Make sure it's None for auto mode
     
     # Run optimization
     with st.spinner('🔬 Optimizing formulation parameters...'):
@@ -399,6 +413,7 @@ if optimize_button:
             n_recommendations,
             constraints=polymer_constraints  # Pass polymer constraints
         )
+    
     # Success message
     st.success("✅ **Optimization Complete!** Found optimal formulation parameters.")
     
@@ -647,5 +662,6 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
