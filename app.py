@@ -160,9 +160,53 @@ with col2:
         step=1,
         help="Number of heteroatoms (N, O, S, etc.)"
     )
+# After drug properties section in sidebar
+
+st.sidebar.markdown("---")
+st.sidebar.header("🔬 Polymer Settings")
+
+# Radio button for mode selection
+polymer_mode = st.sidebar.radio(
+    "How do you want to specify PLGA?",
+    ["Auto-optimize (Recommended)", "I have specific PLGA in my lab"],
+    help="Auto-optimize: Model will find the best PLGA type for you\nSpecific PLGA: You specify which PLGA you have available"
+)
+
+if polymer_mode == "I have specific PLGA in my lab":
+    st.sidebar.info("💡 Specify your available PLGA. Model will optimize other parameters.")
+    
+    # Get available PLGA options from dataset
+    available_mw = sorted(df['polymer_MW'].unique())
+    available_laga = sorted(df['LA/GA'].unique())
+    
+    user_polymer_mw = st.sidebar.selectbox(
+        "PLGA Molecular Weight (kDa)",
+        available_mw,
+        index=available_mw.index(12.0) if 12.0 in available_mw else 0,
+        help="Select the PLGA molecular weight you have in your lab"
+    )
+    
+    user_la_ga = st.sidebar.selectbox(
+        "LA/GA Ratio",
+        available_laga,
+        index=available_laga.index(3.0) if 3.0 in available_laga else 0,
+        help="Lactide/Glycolide ratio of your PLGA"
+    )
+    
+    # Store constraints
+    polymer_constraints = {
+        'polymer_MW': user_polymer_mw,
+        'LA/GA': user_la_ga
+    }
+    
+else:
+    # No constraints - full optimization
+    polymer_constraints = None
 
 st.sidebar.markdown("---")
 st.sidebar.header("⚙️ Optimization Settings")
+# ... rest of your code
+
 
 target_size = st.sidebar.slider(
     "Target Particle Size (nm)",
@@ -327,8 +371,8 @@ def optimize_formulation(drug_properties, target_size, min_ee, n_top):
     return recommendations, stats
 
 # ========== MAIN CONTENT AREA ==========
-if optimize_button:
-    # Collect drug properties
+
+    if optimize_button:
     drug_properties = {
         'mol_MW': mol_MW,
         'mol_logP': mol_logP,
@@ -339,11 +383,25 @@ if optimize_button:
         'mol_heteroatoms': mol_heteroatoms
     }
     
+    # Show what mode is being used
+    if polymer_constraints:
+        st.info(f"🔒 **Using your PLGA:** MW = {polymer_constraints['polymer_MW']} kDa, LA/GA = {polymer_constraints['LA/GA']}")
+        st.info("✨ **Optimizing:** Drug/polymer ratio, surfactant type & concentration, pH, aqueous/organic ratio, solvent polarity")
+    else:
+        st.info("🚀 **Full Auto-Optimization Mode** - Finding the best PLGA type and all formulation parameters")
+    
     # Run optimization
     with st.spinner('🔬 Optimizing formulation parameters...'):
         recommendations, stats = optimize_formulation(
-            drug_properties, target_size, min_ee, n_recommendations
+            drug_properties, 
+            target_size, 
+            min_ee, 
+            n_recommendations,
+            constraints=polymer_constraints  # Pass polymer constraints
         )
+    
+    # ... rest of display code
+    # Run optimization
     
     # Success message
     st.success("✅ **Optimization Complete!** Found optimal formulation parameters.")
@@ -591,4 +649,5 @@ st.markdown("""
     Developed by Hardik Sood | IIT BHU Pharmaceutical Engineering | 
     Supervised by Dr. Ruchi Chawla
 </div>
+
 """, unsafe_allow_html=True)
