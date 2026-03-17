@@ -16,7 +16,7 @@ import random
 
 # ========== PAGE CONFIG ==========
 st.set_page_config(
-    page_title="Nanoformulation Optimizer",
+    page_title="NanoFormula AI",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -57,9 +57,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ========== HEADER ==========
-st.markdown('<div class="main-header">🧬 Multi-Polymer Nanoparticle Formulation Optimizer</div>', 
+st.markdown('<div class="main-header">🧬 NanoFormula AI</div>',  
             unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Dr. Ruchi Chawla\'s Lab | IIT BHU Pharmaceutical Engineering</div>', 
+st.markdown('<div class="sub-header">Multi-Polymer Nanoparticle Formulation Optimizer<br>Dr. Ruchi Chawla\'s Lab | IIT BHU Pharmaceutical Engineering</div>', 
             unsafe_allow_html=True)
 
 # ========== LOAD ALL MODELS ==========
@@ -547,7 +547,7 @@ if not (selected_polymer.startswith("PLGA") and 'optimize' in dir() and optimize
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666; font-size: 13px;'>
-    Developed by Hardik Sood | IIT BHU Pharmaceutical Engineering | 
+    NanoFormula AI v2.0 | Developed by Hardik Sood | IIT BHU Pharmaceutical Engineering |  
     Supervised by Dr. Ruchi Chawla<br>
     PLGA Model: R² = 0.88 (433 samples) | Chitosan Model: R² = 0.83 (44 samples)
 </div>
